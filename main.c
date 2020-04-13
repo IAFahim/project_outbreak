@@ -2,50 +2,56 @@
 #include<conio.h>
 #include<stdlib.h>
 #include<stdbool.h>
+#include <math.h>
+#include <windows.h>
+
 //declare
 
 int age_year=18,age_month=0,age_day=0,currnt_hunger=300,total_hunger=300,current_health=300,total_health=300,momey=0,saving=0;
-int menu_chooes_int;
+char menu_chooes_int;
 bool newgame=1;
-char name[50]="Fahimmanowar";
+char name[50]="Charecter_Fahim";
 char trasport[10][25]={"Barefoot","Shoe","Bus","Cycle"};
 char lodging[10][25]={"Cardboard Box","","",""};
 char Education[10][25]={"None","","",""};
     FILE * fp;
 //protoyepring
-
+void _Food_save(int add_or_reduce);
+void food_lister();
+void spacer();
 void frist_time_opening_the_game();
-void c();
 void main_menu();
 void _Name();
 void _Food();
-void _Age();
+void _Age_year_month_day();
+void _Age_year_save();
+void _Age_month_save(int month);
+void _Age_day_save(int day);
+void _Age_day();
 void _Health();
+void _Health_save(int add_or_reduce);
 void loading_bar(int size);
-void _Money_and_Savings();
 void _Trasport();
 void _Lodging();
 void _Education();
 void cprinter(int dddef_choi, int pppic);
 void _Food_and_Health_show();
 void _Main_Menu_Bar();
+void _Money();
+bool _Money_save(int add_or_reduce);
+void _Savings();
+void _Saving_save(int add_to_saving);
 //main
-death(){
+void death(){
     age_year=18,age_month=0,currnt_hunger=300,total_hunger=300,momey=0,saving=0;
 }
 
 void main(){
-    c();
-    if((fp=fopen("newgame.txt","r"))==NULL)
-    printf("error");
-    frist_time_opening_the_game();
-    fscanf(fp,"%d",newgame);
-    if(newgame){
+    //new game_read_cheak
+    if((fp=fopen("newgame.txt","r"))==NULL){
         frist_time_opening_the_game();
     }
     fclose(fp);
-    
-    
     printf("__Welcome To Life simulator");
     //hunger_load
     main_menu();
@@ -55,7 +61,6 @@ void frist_time_opening_the_game(){
     fp=fopen("newgame.txt","w");
     fprintf(fp,"%d",0);
     fclose(fp);
-    death();
     //name_save
 
     fp=fopen("name.txt","w");
@@ -66,36 +71,46 @@ void frist_time_opening_the_game(){
     fp=fopen("hunger.txt","w");
     fprintf(fp,"%d",currnt_hunger);
     fclose(fp);
-    
+    //health_save
+
     fp=fopen("health.txt","w");
     fprintf(fp,"%d",current_health);
     fclose(fp);
-    
+    //money_save
+
     fp=fopen("money.txt","w");
     fprintf(fp,"%d",momey);
     fclose(fp);
-    
+    //savings_save
+
     fp=fopen("health.txt","w");
     fprintf(fp,"%d",saving);
     fclose(fp);
-    
+    //age_year_save
+
     fp=fopen("age_year.txt","w");
     fprintf(fp,"%d",age_year);
     fclose(fp);
-    
+    //age_month_save
+
     fp=fopen("age_month.txt","w");
     fprintf(fp,"%d",age_month);
     fclose(fp);
-    
+    //age_day_save
+
     fp=fopen("age_day.txt","w");
     fprintf(fp,"%d",age_day);
     fclose(fp);
+    //saving_save
 
+    fp=fopen("savings.txt","w");
+    fprintf(fp,"%d",saving);
+    fclose(fp);
 }
 void _Name(){
     //name_load
     fp=fopen("name.txt","r");
-    fscanf(fp, "%s", name);
+    fscanf(fp, "%s", &name);
     printf("%s\n", name );
     fclose(fp);
 }
@@ -106,28 +121,115 @@ void _Food(){
     printf("Food:\t\t %d/%d ",currnt_hunger,total_hunger); loading_bar(30*(currnt_hunger/(float)total_hunger));
 }
 void _Food_save(int add_or_reduce){
-    fp=fopen("hunger.txt","w");
-    currnt_hunger-=add_or_reduce;
+    currnt_hunger+=add_or_reduce;
     if(currnt_hunger>300){
     currnt_hunger=300;
     }
-    currnt_hunger-=add_or_reduce;
     if(currnt_hunger<=0){
     currnt_hunger=0;
+    death();
     }
-    fscanf(fp, "%d", currnt_hunger);
+    fp=fopen("hunger.txt","w");
+    fprintf(fp, "%d", currnt_hunger);
     fclose(fp);
 }
-void _Age(){
+void _Age_year_month_day(){
+    fp=fopen("age_day.txt","r");
+    fscanf(fp, "%d", &age_day);
+    fclose(fp);
+    fp=fopen("age_month.txt","r");
+    fscanf(fp, "%d", &age_month);
+    fclose(fp);
+    fp=fopen("age_year.txt","r");
+    fscanf(fp, "%d", &age_year);
+    fclose(fp);
+    printf("Age:\t\t Y-%d M-%d D-%d\n",age_year,age_month,age_day);
+}
+void _Age_year_save(){
+    fp=fopen("age_year.txt","w");
+    fscanf(fp, "%d", age_year);
+    fclose(fp);
+}
+void _Age_month_save(int month){
+    momey = (momey* (pow((1 + 0.03), month)))+momey;
+    if(month+age_month>12){
+        age_year++;
+        age_month=(month+age_month)-12;
+    }else{
+        age_month+=month;
+    }
+    fp=fopen("age_month.txt","w");
+    fscanf(fp, "%d", age_month);
+    fclose(fp);
+}
+void _Age_day(){
+    fp=fopen("age_day.txt","r");
+    fscanf(fp, "%d", &age_day);
+    fclose(fp);
     printf("Age:\t\t %d,%d\n",age_year,age_month);
 }
+
+void _Age_day_save(int day){
+    if(day+age_day>30){
+        _Age_month_save(1);
+        age_day=(day+age_day)-30;
+    }else{
+        age_day+=day;
+    }
+    fp=fopen("age_day.txt","w");
+    fscanf(fp, "%d", age_day);
+    fclose(fp);
+}
 void _Health(){
+    fp=fopen("health.txt","r");
+    fscanf(fp, "%d", &current_health);
+    fclose(fp);
     printf("Health:\t\t %d/%d ",current_health,total_health); loading_bar(30*(current_health/(float)total_health));
 }
-void _Money_and_Savings(){
-    printf("Money: %d\t Saving: %d\n",momey,saving);
+void _Health_save(int add_or_reduce){
+    current_health+=add_or_reduce;
+    if(current_health>300){
+    current_health=300;
+    }
+    if(current_health<=0){
+    current_health=0;
+    death();
+    }
+    fp=fopen("health.txt","w");
+    fprintf(fp, "%d", current_health);
+    fclose(fp);
+}
+void _Money(){
+    fp=fopen("money.txt","r");
+    fscanf(fp, "%d", &current_health);
+    fclose(fp);
+    printf("Money: %d\t ",momey);
+}
+bool _Money_save(int add_or_reduce){
+    int temp=momey;
+    if(temp+=add_or_reduce<0){
+    spacer();
+    printf("You can\'t buy this stuff. You Need %d",-(add_or_reduce+momey));
+    return false;
+    }else{
+    momey+=add_or_reduce;
+    }
+    fp=fopen("money.txt","w");
+    fscanf(fp, "%d", momey);
+    fclose(fp);
+    return true;
+}
+void _Savings(){
+    printf("Saving: %d\n",saving);
     printf("\n");
 }
+void _Saving_save(int add_to_saving){
+    saving+=add_to_saving;
+    fp=fopen("savings.txt","w");
+    fscanf(fp, "%d", saving);
+    fclose(fp);
+}
+
 void _Trasport(){
     printf("Transport:\t ");
     cprinter( 0, 0);
@@ -141,13 +243,14 @@ void _Education(){
     cprinter( 2, 0);
 }
 void _Food_and_Health_show(){
-    printf("|__<<____[ Buy Food(7) ]_____________[ Buy Health(9) ]_____>>__|\n");
+    printf("|__<<____[ Buy Food(7) ]____________[ Buy Health(9) ]_____>>__|\n");
 }
+char prevoius_menu;
 void _Main_Menu_Bar(){
-    printf("\n|_<<___Home(0)__Work(1)__Shop(2)__Skill(3)__Save&Exit(4)___>>_| Pick: ");
-    scanf("%d",&menu_chooes_int);   
+    printf("\n|_<<___Home(0)__Work(1)__Shop(2)__Skill(3)__Save&Exit(X)___>>_| Pick: ");
+    scanf("%c",&menu_chooes_int);
+    fflush(stdin);
 }
-
 void main_menu(){
     //printf("  ______              _ \n");
     //printf(" |  ____|            | |\n");
@@ -155,75 +258,189 @@ void main_menu(){
     //printf(" |  __/ _ \\ / _ \\ / _` |\n");
     //printf(" | | | (_) | (_) | (_| |\n");
     //printf(" |_|  \\___/ \\___/ \\__,_|\n");
-    menu_chooes_int=0;
+    menu_chooes_int='0';
     do{
 
     switch (menu_chooes_int)
     {
-        case 0:
-        printf("______Home(0)___________________\n");
+        case '0':
+        prevoius_menu=menu_chooes_int;
+        system("cls");
+        system("color 02");
+        //system("mode 75,50");
+        printf("___Home(0)______________________________________________\n");
         _Name();
-        _Age();
+        spacer();//just to look good _he he
+        _Age_year_month_day();
+        spacer();//just to look good _he he
         _Food();
+        spacer();//just to look good _he he
         _Health();
-        _Money_and_Savings();
-
+        spacer();//just to look good _he he
+        _Money();
+        _Savings();
+        spacer();//just to look good _he he
         _Trasport();
+        spacer();//just to look good _he he
         _Lodging();
+        spacer();//just to look good _he he
         _Education();
         _Food_and_Health_show();
         break;
 
-        case 1:
+        case '1':
+        prevoius_menu=menu_chooes_int;
+        system("cls");
+        printf("_______Work(1)__________________________________________\n");
         break;
 
-        case 2:
+        case '2':
+        prevoius_menu=menu_chooes_int;
+        system("cls");
+        printf("____________Shop(2)____________________________________\n");
         break;
 
-        case 3:
+        case '3':
+        prevoius_menu=menu_chooes_int;
+        system("cls");
+        printf("____________________Skills(3)__________________________\n");
         break;
 
-        case 4:
+        case 'x':case 'X':
         exit(1);
         break;
 
-        case 7:
+        case '7':
+        prevoius_menu=menu_chooes_int;
         system("cls");
         //system("Echo ^G");
         _Food();
         _Health();
         food_lister();
-        
         break;
 
-        case 8:
+        case '8':
         break;
 
+        case 'a':case 'A':
+
+        switch (prevoius_menu)
+        {
+        case '7'://eat_garvage
+            _Food_save(5);
+            _Health_save(-10);
+            age_day++;
+            break;
+        }
+        break;
+        case 'b':case 'B':
+
+        switch (prevoius_menu)
+        {
+        case '7'://eat_garvage
+            if(_Money_save(-5))
+            break;
+            _Food_save(10);
+
+            break;
+        }
+        break;
+        case 'c':case 'C':
+        switch (prevoius_menu)
+        {
+        case '7'://eat_garvage
+            if(_Money_save(-15))
+            break;
+            _Food_save(20);
+
+            break;
+        }
+        break;
+        case 'd':case 'D':
+        switch (prevoius_menu)
+        {
+        case '7'://eat_garvage
+            if(_Money_save(-30))
+            break;
+            _Food_save(20);
+
+            break;
+        }
+        break;
+        case 'e':case 'E':
+
+        switch (prevoius_menu)
+        {
+        case '7'://eat_garvage
+            if(_Money_save(-50))
+            break;
+            _Food_save(20);
+
+            break;
+        }
+        break;
+        case 'f':case 'F':
+
+        switch (prevoius_menu)
+        {
+        case '7'://eat_garvage
+            if(_Money_save(-100))
+            break;
+            _Food_save(20);
+
+            break;
+        }
+        break;
+        case 'g':case 'G':
+
+        switch (prevoius_menu)
+        {
+        case '7'://eat_garvage
+            if(_Money_save(-200))
+            break;
+            _Food_save(20);
+
+            break;
+        }
+        break;
+        case 'h':case 'H':
+        switch (prevoius_menu)
+        {
+        case '7'://eat_garvage
+            if(_Money_save(-500))
+            break;
+            _Food_save(20);
+
+            break;
+        }
+
+        break;
+        case 'i':case 'I':
+
+        break;
         default:
-        
+
         break;
+    }
+    if(menu_chooes_int=='a'){
+        main_menu();
     }
         _Main_Menu_Bar();
+    fflush(stdin);
     }while (1);
-    {
-        /* code */
-    }
-    
-    //printf("");
-    //printf("");
-    //printf("");
 }
-char food[7][40]={"Eat hotdog","Eat fastfood","Eat microwave meal","Eat Self made meal","Eat in cheap restaurant","Eatin expensive restaurant","Eat from private chef"};
+char food[8][40]={"Eat trash","Eat hotdog","Eat fastfood","Eat microwave meal","Eat Self made meal","Eat in cheap restaurant","Eatin expensive restaurant","Eat from private chef"};
 int food_price[8]={0,5,15,30,50,100,200,500};
 void food_lister(){
-        printf("_Food______________________\n");
-        for (int i = 0; i < 7; i++)
+        printf("____________________Food(7)______________________\n");
+        for (int i = 0; i < 8; i++)
         {
         looper(i,food_price[i],0);
         }
-        
 }
+
 void looper(int list,int money_needed,int chozen_one){
+
     if( momey>=money_needed){
         printf("[+] ");
     }
@@ -239,13 +456,14 @@ void looper(int list,int money_needed,int chozen_one){
     {
         printf("%c",food[list][i]);
     }
+    printf(" (%c)",65+list);
     for (; i < 100-i; i++)
     {
         printf(" ");
     }
-    printf("%d",food_price[list]);    
+    printf("%d",food_price[list]);
     break;
-    
+
     default:
         break;
     }
@@ -274,7 +492,7 @@ void cprinter(int dddef_choi, int pppic){
         }
         break;
     case 3:
-        
+
         break;
     default:
         break;
@@ -295,9 +513,13 @@ void loading_bar(int size){
     printf("|");
     printf("\n");
 }
-void c(){
-    system("cls");
-    printf("_____");
-    
+void spacer(){
+printf("|\t");
 }
-
+void gotoxy(int x, int y)
+{
+COORD coord;
+coord.X = x;
+coord.Y = y;
+SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
+}
